@@ -1,0 +1,55 @@
+{
+    "timestamp": {
+      "unix_format": 1705234029,
+      "human_readable_format": "2024-01-13 11:46:10"
+    },
+    "system_info": {
+      "hostname": "ubuntu",
+      "dist_name": "Ubuntu 22.04.3 LTS",
+      "kernel_ver": "Linux 5.15.0-91-generic",
+      "sys_info": "Ubuntu 22.04.3 LTS (Linux 5.15.0-91-generic)"
+    },
+    "cpu": {
+      "cpu_cores": "2",
+      "last_15min_cpu_percentage": "0"
+    },
+    "disk": {
+      "mount_point": "/",
+      "total_disk_avail": "97G",
+      "disk_usage_amount": "8.6G",
+      "disk_usage_percentage": "9%"
+    },
+    "memory": {
+      "total_memory": "3876",
+      "total_memory_human": "3.8Gi",
+      "used_memory": "395",
+      "used_memory_human": "395Mi",
+      "memory_usage_percentage": "10.00"
+    },
+    "swap": {
+      "swap_status": "Off"
+    },
+    "processes": {
+      "amount_processes": "112"
+    },
+    "users": {
+      "logged_in_users": "1"
+    },
+    "updates": {
+      "amount_of_available_updates": "0",
+      "updates_available_output": "no updates available"
+    },
+    "system_restart": {
+      "status": "System restart required",
+      "time_elapsed_seconds": "213125",
+      "time_elapsed_human_readable": "59h 12m 5s"
+    },
+    "linux_server_state_tool": {
+      "repo_url": "https://github.com/Sokrates1989/linux-server-status.git",
+      "repo_accessible": "True",
+      "local_changes": "No",
+      "up_to_date": "True",
+      "behind_count": "0"
+    }
+}
+  

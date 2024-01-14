@@ -1,0 +1,22 @@
+# Do not version IDE .
+.idea
+
+# Do not version config.txt .
+config/config.txt
+
+# Do not version logs. 
+logs/*
+# But keep folder structure.
+!logs/.gitkeep
+!logs/dayBased/.gitkeep
+
+# Do not version message sent states. 
+messageSentStates/*
+# But keep folder structure.
+!messageSentStates/.gitkeep
+
+# Do not version cached python dirs.
+**/__pycache__
+
+# Do not version docker compose (use template instead to reflect changes).
+docker-compose.yml

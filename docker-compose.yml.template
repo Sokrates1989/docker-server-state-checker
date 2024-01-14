@@ -1,0 +1,30 @@
+version: "3.9"
+
+networks:
+  mynet:
+    name: mynet
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
+
+services:
+  state_checker_check:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: state_checker_check
+    volumes:
+      - .:/code  # <--  THIS line enables hot code reloading! and writes logs back to source Dir.
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    networks:
+      - mynet
+    environment:
+      - serverName="Please Name the server"
+      - botToken="BOTTOKENBOTFATHERGAVEYOU"
+      - errorChatIDs="-xxxxx,xxxxxx"
+      - warningChatIDs="-xxxxx,xxxxxx"
+      - infoChatIDs="-xxxxx"
+    command: ["python", "src/check_server.py"]

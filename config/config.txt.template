@@ -1,0 +1,63 @@
+{
+	"serverName": "Name the server",
+	"messageFrequency":
+	{
+		"info": "1h",
+		"warning": "1d",
+		"error": "3d"
+	},
+	"telegram":
+	{
+		"errorChatIDs":"-xxxxxxxxx,-xxxxxxxxx",
+		"warningChatIDs":"-xxxxxxxxx",
+		"infoChatIDs":"-xxxxxxxxx,-xxxxxxxxx"
+	},
+	"thresholds":
+	{
+		"timestampAgeMinutes":
+		{
+			"warning":"65",
+			"error":"185"
+		},
+		"cpu":
+		{
+			"warning":"80",
+			"error":"100"
+		},
+		"disk":
+		{
+			"warning":"75",
+			"error":"90"
+		},
+		"memory":
+		{
+			"warning":"75",
+			"error":"90"
+		},
+		"processes":
+		{
+			"warning":"150",
+			"error":"270"
+		},
+		"users":
+		{
+			"warning":"2",
+			"error":"3"
+		},
+		"updates":
+		{
+			"warning":"10",
+			"error":"25"
+		},
+		"system_restart":
+		{
+			"warning":"10d",
+			"error":"50d"
+		},
+		"linux_server_state_tool":
+		{
+			"warning":"1",
+			"error":"5"
+		}
+	}
+}
