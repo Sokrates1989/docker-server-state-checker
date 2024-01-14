@@ -15,6 +15,11 @@ messageSentStates/*
 # But keep folder structure.
 !messageSentStates/.gitkeep
 
+# Do not version serverinfo. 
+serverInfo/*
+# But keep folder structure.
+!serverInfo/.gitkeep
+
 # Do not version cached python dirs.
 **/__pycache__
 
