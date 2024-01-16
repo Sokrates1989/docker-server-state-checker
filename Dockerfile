@@ -17,3 +17,15 @@ RUN python3 -m venv $VIRTUAL_ENV \
 
 # Copy the app.
 COPY . /code
+
+# Remove unwanted files or directories.
+RUN rm -rf \
+    /code/.git \
+    /code/.idea \
+    /code/config/config.txt \
+    /code/docker \
+    /code/logs \
+    /code/serverInfo \
+    /code/docker-compose.yml \
+    && mkdir -p /code/logs/dayBased \
+    && mkdir -p /code/serverInfo 

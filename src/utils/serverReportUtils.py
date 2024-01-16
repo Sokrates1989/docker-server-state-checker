@@ -4,6 +4,8 @@
 import time
 # For file operations with operating system.
 import os
+# To improve error indication (sys.exit).
+import sys
 # For getting config.
 import json
 # To create enumerations.
@@ -24,14 +26,18 @@ config_file = open(config_file_pathAndName)
 config_array = json.load(config_file)
 
 # ServerInfoFile.
-serverInfo_file_pathAndName = os.path.join(os.path.dirname(__file__), "..", "..", "serverInfo/", "system_info.json")
-serverInfo_file = open(serverInfo_file_pathAndName)
-serverInfo_array = json.load(serverInfo_file)
+try:
+    serverInfo_file_pathAndName = os.path.join(os.path.dirname(__file__), "..", "..", "serverInfo/", "system_info.json")
+    serverInfo_file = open(serverInfo_file_pathAndName)
+    serverInfo_array = json.load(serverInfo_file)
+except Exception as e:
+    print(f"\ncould not read serverInfo/system_info.json: {e} \nDid you map the serverInfo directory correctly? \nHas the report been created on the server? \n")
+    sys.exit(1)  # Use a non-zero exit code to indicate an error
+
 
 # ServerName.
-serverNameENV = os.getenv('serverName').strip().strip('"')
-serverNameConfig = config_array.get('serverName').strip().strip('"')
-serverName = serverNameENV or serverNameConfig or "Unknown - Please set serverName in Env or config"
+serverName = os.getenv('serverName') or config_array.get('serverName') or "Unknown - Please set serverName in Env or config"
+serverName = serverName.strip().strip('"')
 
 # Create a simple consize text message from the server state json and server state.
 def getServerReport(messagePlatform: MessagingPlatform = MessagingPlatform.DEFAULT) -> ServerReport:

@@ -10,11 +10,6 @@ logs/*
 !logs/.gitkeep
 !logs/dayBased/.gitkeep
 
-# Do not version message sent states. 
-messageSentStates/*
-# But keep folder structure.
-!messageSentStates/.gitkeep
-
 # Do not version serverinfo. 
 serverInfo/*
 # But keep folder structure.
