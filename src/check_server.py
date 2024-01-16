@@ -18,16 +18,11 @@ import logger as Logger
 # To interact with telegramBots.
 import telegramUtils
 # Get SeverStateReport.
-import serverReportUtils
+import serverReportUtils as ServerReportUtils
 # Sending report Utils.
 import sendReportUtils
 
 ## Initialize vars.
-
-# Get config.
-config_file_pathAndName = os.path.join(os.path.dirname(__file__), "..", "config/", "config.txt")
-config_file = open(config_file_pathAndName)
-config_array = json.load(config_file)
 
 # Instantiate classes.
 # Logger.
@@ -50,6 +45,7 @@ def handleCommandException(exceptionLocationAndAdditionalInformation, exception)
 def handleServerReport():
 
     # Get the server report.
+    serverReportUtils = ServerReportUtils.ServerReportUtils()
     serverReport = serverReportUtils.getServerReport()
 
     # Log information.
@@ -61,4 +57,8 @@ def handleServerReport():
 
 
 # Send the current state of the server to channels.
-handleServerReport()
+try:
+    handleServerReport()
+except Exception as e:
+    # If there is an error handling the server report, try to send info about that as well.
+    handleCommandException("handleServerReport", e)
