@@ -82,11 +82,11 @@ class ServerReportUtils:
         serverReport = ""
 
         # Hostname.
-        serverReport += f"<b>Hostname:</b> {preformatted(self.serverInfo_array['system_info']['hostname'])}\n"
+        serverReport += f"<b>Hostname:</b> {preformatted(self.server_info_array['system_info']['hostname'])}\n"
 
         # Timestamp.
         current_timestamp = int(time.time())
-        system_info_timestamp = self.serverInfo_array['timestamp']['unix_format']
+        system_info_timestamp = self.server_info_array['timestamp']['unix_format']
         thresholds = self.get_thresholds('timestampAgeMinutes')
         stateIndicatingIcon = ""
         if int(current_timestamp) > int(system_info_timestamp) + float(thresholds.error) * 60:
@@ -95,106 +95,106 @@ class ServerReportUtils:
         elif int(current_timestamp) > int(system_info_timestamp) + float(thresholds.warning) * 60:
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Timestamp:</b> {preformatted(self.serverInfo_array['timestamp']['human_readable_format'])}\n"
+        serverReport += stateIndicatingIcon + f"<b>Timestamp:</b> {preformatted(self.server_info_array['timestamp']['human_readable_format'])}\n"
 
         # Add Last 15min CPU Percentage.
         thresholds = self.get_thresholds('cpu')
         stateIndicatingIcon = ""
-        system_value = float(self.serverInfo_array['cpu']['last_15min_cpu_percentage'].strip().strip("%"))
+        system_value = float(self.server_info_array['cpu']['last_15min_cpu_percentage'].strip().strip("%"))
         if system_value > float(thresholds.error):
             hasError = True
             stateIndicatingIcon = errorIcon
         elif system_value > float(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        cpu_percentage_string=self.serverInfo_array['cpu']['last_15min_cpu_percentage'] + "%"
+        cpu_percentage_string=self.server_info_array['cpu']['last_15min_cpu_percentage'] + "%"
         serverReport += stateIndicatingIcon + f"<b>CPU:</b> {preformatted(cpu_percentage_string)}\n"
 
         # Add Disk Usage information.
         thresholds = self.get_thresholds('disk')
         stateIndicatingIcon = ""
-        system_value = float(self.serverInfo_array['disk']['disk_usage_percentage'].strip().strip("%"))
+        system_value = float(self.server_info_array['disk']['disk_usage_percentage'].strip().strip("%"))
         if system_value > float(thresholds.error):
             hasError = True
             stateIndicatingIcon = errorIcon
         elif system_value > float(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        disk_usage_info = f"{self.serverInfo_array['disk']['disk_usage_percentage']} " \
-                        f"({self.serverInfo_array['disk']['disk_usage_amount']} / {self.serverInfo_array['disk']['total_disk_avail']})"
+        disk_usage_info = f"{self.server_info_array['disk']['disk_usage_percentage']} " \
+                        f"({self.server_info_array['disk']['disk_usage_amount']} / {self.server_info_array['disk']['total_disk_avail']})"
         serverReport += stateIndicatingIcon + f"<b>Disk:</b> {preformatted(disk_usage_info)}\n"
 
         # Add Memory Usage information.
         thresholds = self.get_thresholds('memory')
         stateIndicatingIcon = ""
-        system_value = float(self.serverInfo_array['memory']['memory_usage_percentage'].strip().strip("%"))
+        system_value = float(self.server_info_array['memory']['memory_usage_percentage'].strip().strip("%"))
         if system_value > float(thresholds.error):
             hasError = True
             stateIndicatingIcon = errorIcon
         elif system_value > float(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        memory_usage_info = f"{self.serverInfo_array['memory']['memory_usage_percentage']}% " \
-                            f"({self.serverInfo_array['memory']['used_memory_human']} / {self.serverInfo_array['memory']['total_memory_human']})"
+        memory_usage_info = f"{self.server_info_array['memory']['memory_usage_percentage']}% " \
+                            f"({self.server_info_array['memory']['used_memory_human']} / {self.server_info_array['memory']['total_memory_human']})"
         serverReport += stateIndicatingIcon + f"<b>Memory:</b> {preformatted(memory_usage_info)}\n"
 
         # Add Swap Status information.
         stateIndicatingIcon = ""
-        if self.serverInfo_array['swap']['swap_status'] != "Off":
+        if self.server_info_array['swap']['swap_status'] != "Off":
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Swap Status:</b> {preformatted(self.serverInfo_array['swap']['swap_status'])}\n"
+        serverReport += stateIndicatingIcon + f"<b>Swap Status:</b> {preformatted(self.server_info_array['swap']['swap_status'])}\n"
 
         # Add Processes.
         thresholds = self.get_thresholds('processes')
         stateIndicatingIcon = ""
-        system_value = float(self.serverInfo_array['processes']['amount_processes'])
+        system_value = float(self.server_info_array['processes']['amount_processes'])
         if system_value > float(thresholds.error):
             hasError = True
             stateIndicatingIcon = errorIcon
         elif system_value > float(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Processes:</b> {preformatted(self.serverInfo_array['processes']['amount_processes'])}\n"
+        serverReport += stateIndicatingIcon + f"<b>Processes:</b> {preformatted(self.server_info_array['processes']['amount_processes'])}\n"
         
         # Users information.
         thresholds = self.get_thresholds('users')
         stateIndicatingIcon = ""
-        system_value = float(self.serverInfo_array['users']['logged_in_users'])
+        system_value = float(self.server_info_array['users']['logged_in_users'])
         if system_value > float(thresholds.error):
             hasError = True
             stateIndicatingIcon = errorIcon
         elif system_value > float(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Logged In Users:</b> {preformatted(self.serverInfo_array['users']['logged_in_users'])}\n"
+        serverReport += stateIndicatingIcon + f"<b>Logged In Users:</b> {preformatted(self.server_info_array['users']['logged_in_users'])}\n"
 
         # Add Updates information.
         thresholds = self.get_thresholds('updates')
         stateIndicatingIcon = ""
-        system_value = float(self.serverInfo_array['updates']['amount_of_available_updates'])
+        system_value = float(self.server_info_array['updates']['amount_of_available_updates'])
         if system_value > float(thresholds.error):
             hasError = True
             stateIndicatingIcon = errorIcon
         elif system_value > float(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        updates_info = f"{self.serverInfo_array['updates']['amount_of_available_updates']} " \
-                    f"({self.serverInfo_array['updates']['updates_available_output']})"
+        updates_info = f"{self.server_info_array['updates']['amount_of_available_updates']} " \
+                    f"({self.server_info_array['updates']['updates_available_output']})"
         serverReport += stateIndicatingIcon + f"<b>Available Updates:</b> {preformatted(updates_info)}\n"
 
         # Add System Restart information with an if-else statement.
         thresholds = self.get_thresholds('system_restart')
         stateIndicatingIcon = ""
-        system_value = float(self.serverInfo_array['system_restart']['time_elapsed_seconds'])
+        system_value = float(self.server_info_array['system_restart']['time_elapsed_seconds'])
         if system_value > timeStringUtils.convert_time_string_to_seconds(thresholds.error):
             hasError = True
             stateIndicatingIcon = errorIcon
         elif system_value > timeStringUtils.convert_time_string_to_seconds(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        restart_info = "No system restart required" if self.serverInfo_array['system_restart']['status'] == 'No' else \
-            f"System restart required for {preformatted(self.serverInfo_array['system_restart']['time_elapsed_human_readable'])}"
+        restart_info = "No system restart required" if self.server_info_array['system_restart']['status'] == 'No' else \
+            f"System restart required for {preformatted(self.server_info_array['system_restart']['time_elapsed_human_readable'])}"
         serverReport += stateIndicatingIcon + f"<b>System Restart:</b> {preformatted(restart_info)}\n"
 
         # Add Linux Server State Tool information.
@@ -202,17 +202,17 @@ class ServerReportUtils:
         thresholds = self.get_thresholds('linux_server_state_tool')
         stateIndicatingIcon = ""
         # Check remote connection.
-        if self.serverInfo_array['linux_server_state_tool']['repo_accessible'] == "True":
+        if self.server_info_array['linux_server_state_tool']['repo_accessible'] == "True":
 
             # Check local changes.
-            if self.serverInfo_array['linux_server_state_tool']['local_changes'] == "Yes":
+            if self.server_info_array['linux_server_state_tool']['local_changes'] == "Yes":
                 tool_info += "Uncommitted local changes, "
 
             # Is repo up to date?
-            git_behind_count = int(self.serverInfo_array['linux_server_state_tool']['behind_count'])
+            git_behind_count = int(self.server_info_array['linux_server_state_tool']['behind_count'])
             if git_behind_count > 0:
                 
-                system_value = float(self.serverInfo_array['linux_server_state_tool']['behind_count'])
+                system_value = float(self.server_info_array['linux_server_state_tool']['behind_count'])
                 if system_value > float(thresholds.error):
                     hasError = True
                     stateIndicatingIcon = errorIcon
@@ -224,7 +224,7 @@ class ServerReportUtils:
             else:
                 tool_info += f"Tool is up to date"
         else:
-            tool_info += "Remote repo Not accessible!! Check connection!! repo_accessible: " + self.serverInfo_array['linux_server_state_tool']['repo_accessible'] 
+            tool_info += "Remote repo Not accessible!! Check connection!! repo_accessible: " + self.server_info_array['linux_server_state_tool']['repo_accessible'] 
 
         serverReport += f"<b>Linux Server State Tool:</b> {preformatted(tool_info)}\n"
 
@@ -235,7 +235,7 @@ class ServerReportUtils:
             stateIndicatingIcon = errorIcon
         elif hasWarning == True:
             stateIndicatingIcon = warningIcon
-        serverHeading = stateIndicatingIcon + f"<b>Server Status Report</b> - {preformatted(self.serverName)}\n"
+        serverHeading = stateIndicatingIcon + f"<b>Server Status Report</b> - {preformatted(self.server_name)}\n"
         serverReport = serverHeading + serverReport
 
         return ServerReport(serverReport, hasWarning=hasWarning, hasError=hasError)
