@@ -145,6 +145,93 @@ class ServerReportUtils:
             stateIndicatingIcon = warningIcon
         serverReport += stateIndicatingIcon + f"<b>Swap Status:</b> {preformatted(self.server_info_array['swap']['swap_status'])}\n"
 
+        # Network info in server info?
+        if 'network' in self.server_info_array:
+
+            # Vnstab Enabled?
+            if self.server_info_array['network']['is_vnstab_installed'].upper() == "TRUE":
+
+                # Enough network data?
+                if self.server_info_array['network']['has_vnstab_enough_data'].upper() == "TRUE":
+
+                    # Thresholds in config?
+                    thresholds_available = True
+                    try:
+                        thresholds_up = self.get_thresholds('network_up')
+                        thresholds_down = self.get_thresholds('network_down')
+                        thresholds_total = self.get_thresholds('network_total')
+                    except Exception as e:
+                        thresholds_available = False
+
+
+                    # Add Network Usage information.
+                    if thresholds_available == True:
+
+                        # Network up.
+                        thresholds = thresholds_up
+                        stateIndicatingIcon = ""
+                        system_value = float(self.server_info_array['network']['upstream_avg_bits'].strip())
+                        if system_value > float(thresholds.error) and float(thresholds.error) != 0:
+                            hasError = True
+                            stateIndicatingIcon = errorIcon
+                        elif system_value > float(thresholds.warning) and float(thresholds.warning) != 0:
+                            hasWarning = True
+                            stateIndicatingIcon = warningIcon
+                        network_up_info = f"{self.server_info_array['network']['upstream_avg_human']}"
+                        serverReport += stateIndicatingIcon + f"<b>Network Upstream:</b> {preformatted(network_up_info)}\n"
+
+                        # Network down.
+                        thresholds = thresholds_down
+                        stateIndicatingIcon = ""
+                        system_value = float(self.server_info_array['network']['downstream_avg_bits'].strip())
+                        if system_value > float(thresholds.error) and float(thresholds.error) != 0:
+                            hasError = True
+                            stateIndicatingIcon = errorIcon
+                        elif system_value > float(thresholds.warning) and float(thresholds.warning) != 0:
+                            hasWarning = True
+                            stateIndicatingIcon = warningIcon
+                        network_up_info = f"{self.server_info_array['network']['downstream_avg_human']}"
+                        serverReport += stateIndicatingIcon + f"<b>Network Downstream:</b> {preformatted(network_up_info)}\n"
+
+                        # Network total.
+                        thresholds = thresholds_total
+                        stateIndicatingIcon = ""
+                        system_value = float(self.server_info_array['network']['total_network_avg_bits'].strip())
+                        if system_value > float(thresholds.error) and float(thresholds.error) != 0:
+                            hasError = True
+                            stateIndicatingIcon = errorIcon
+                        elif system_value > float(thresholds.warning) and float(thresholds.warning) != 0:
+                            hasWarning = True
+                            stateIndicatingIcon = warningIcon
+                        network_up_info = f"{self.server_info_array['network']['total_network_avg_human']}"
+                        serverReport += stateIndicatingIcon + f"<b>Network Total:</b> {preformatted(network_up_info)}\n"
+
+                    else:
+                        # No Thresholds in config.
+                        hasError = True
+                        stateIndicatingIcon = errorIcon
+                        network_error_msg = f"No network thresholds in config"
+                        serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n"
+                else:
+                    # Not Enough vnstab data yet.
+                    hasWarning = True
+                    stateIndicatingIcon = warningIcon
+                    network_error_msg = f"Vnstab does not have enough data yet"
+                    serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n"
+            else:
+                # Vnstab is not enabled.
+                hasError = True
+                stateIndicatingIcon = errorIcon
+                network_error_msg = f"Vnstab is not enabled"
+                serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n" 
+        else:
+            # No Network info in server info.
+            hasError = True
+            stateIndicatingIcon = errorIcon
+            network_error_msg = f"No network info in server info array"
+            serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n"
+
+
         # Add Processes.
         thresholds = self.get_thresholds('processes')
         stateIndicatingIcon = ""

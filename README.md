@@ -8,7 +8,7 @@ The file / the directory of this file are being mapped as volumes to this image.
 
 This image/container (serverStateChecker) should also be created/executed on a similar schedule as the servers cron.
 
-The tool writes regular information into cretain telegram chats/ chatgroups.
+The tool writes regular information into certain telegram chats/ chatgroups.
 If Thresholds are exceeded other measurs can be taken to address the new importance of the information. 
 Using a different chat, that uses other -more intrusive- notification settings or an email could be such measurs.
 
