@@ -452,7 +452,7 @@ class ServerReportUtils:
         elif system_value > timeStringUtils.convert_time_string_to_seconds(thresholds.warning):
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        restart_info = "No system restart required" if self.server_info_array['system_restart']['status'] == 'No' else \
+        restart_info = "No system restart required" if self.server_info_array['system_restart']['status'] == 'No restart required' else \
             f"System restart required for {wrap_with_code(self.server_info_array['system_restart']['time_elapsed_human_readable'])}"
         serverReport += stateIndicatingIcon + f"<b>System Restart:</b> {wrap_with_code(restart_info)}\n"
 
