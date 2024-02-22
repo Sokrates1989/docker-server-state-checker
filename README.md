@@ -29,6 +29,7 @@ docker tag server-state-checker sokrates1989/server-state-checker:major.minor.pa
 docker login
 docker push sokrates1989/server-state-checker:latest
 docker push sokrates1989/server-state-checker:major.minor.patch
+docker image ls sokrates1989/server-state-checker
 git status
 
 ```
@@ -41,6 +42,7 @@ docker build -t server-state-checker .
 docker tag server-state-checker sokrates1989/server-state-checker:DEBUGmajor.minor.patch
 docker login
 docker push sokrates1989/server-state-checker:major.minor.patch
+docker image ls sokrates1989/server-state-checker
 git status
 
 ```
