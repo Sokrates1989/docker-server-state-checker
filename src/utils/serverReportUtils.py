@@ -45,6 +45,9 @@ class ServerReportUtils:
             # ServerName.
             self.server_name = os.getenv('serverName') or self.config_array.get('serverName') or "Unknown - Please set serverName in Env or config"
             self.server_name = self.server_name.strip().strip('"')
+
+            # Gluster install settings.
+            self.gluster_not_installed_handling = os.getenv('gluster_not_installed_handling') or self.config_array.get('gluster_not_installed_handling') or "not specified"
             
         except Exception as e:
             errorMessage = f"\nCould not read config/config.txt: {e} \nDid you map the config directory? \n"
@@ -74,15 +77,32 @@ class ServerReportUtils:
         errorIcon="🚨"
         warningIcon="⚠️"
         
-        # Helper function to format text as preformatted.
-        def preformatted(text):
+        # Helper function to format text as code.
+        def wrap_with_code(text):
             return f"<code>{text}</code>"
+        
+        # Helper function to format text as bold.
+        def italicUnderline(text):
+            return f"<u><i>{text}</i></u>"
+        
+        # Determine, if array is empty (or only contains one empty string).
+        def isArrayEmpty(array):
+            if array:
+                if len(array) == 1:
+                    if array[0]:
+                        return False
+                    else:
+                        return True
+                else:
+                    return False
+            else:
+                return True
 
         # Initialize the serverReport.
         serverReport = ""
 
         # Hostname.
-        serverReport += f"<b>Hostname:</b> {preformatted(self.server_info_array['system_info']['hostname'])}\n"
+        serverReport += f"<b>Hostname:</b> {wrap_with_code(self.server_info_array['system_info']['hostname'])}\n"
 
         # Timestamp.
         current_timestamp = int(time.time())
@@ -95,7 +115,7 @@ class ServerReportUtils:
         elif int(current_timestamp) > int(system_info_timestamp) + float(thresholds.warning) * 60:
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Timestamp:</b> {preformatted(self.server_info_array['timestamp']['human_readable_format'])}\n"
+        serverReport += stateIndicatingIcon + f"<b>Timestamp:</b> {wrap_with_code(self.server_info_array['timestamp']['human_readable_format'])}\n"
 
         # Add Last 15min CPU Percentage.
         thresholds = self.get_thresholds('cpu')
@@ -108,7 +128,7 @@ class ServerReportUtils:
             hasWarning = True
             stateIndicatingIcon = warningIcon
         cpu_percentage_string=self.server_info_array['cpu']['last_15min_cpu_percentage'] + "%"
-        serverReport += stateIndicatingIcon + f"<b>CPU:</b> {preformatted(cpu_percentage_string)}\n"
+        serverReport += stateIndicatingIcon + f"<b>CPU:</b> {wrap_with_code(cpu_percentage_string)}\n"
 
         # Add Disk Usage information.
         thresholds = self.get_thresholds('disk')
@@ -122,7 +142,7 @@ class ServerReportUtils:
             stateIndicatingIcon = warningIcon
         disk_usage_info = f"{self.server_info_array['disk']['disk_usage_percentage']} " \
                         f"({self.server_info_array['disk']['disk_usage_amount']} / {self.server_info_array['disk']['total_disk_avail']})"
-        serverReport += stateIndicatingIcon + f"<b>Disk:</b> {preformatted(disk_usage_info)}\n"
+        serverReport += stateIndicatingIcon + f"<b>Disk:</b> {wrap_with_code(disk_usage_info)}\n"
 
         # Add Memory Usage information.
         thresholds = self.get_thresholds('memory')
@@ -136,14 +156,38 @@ class ServerReportUtils:
             stateIndicatingIcon = warningIcon
         memory_usage_info = f"{self.server_info_array['memory']['memory_usage_percentage']}% " \
                             f"({self.server_info_array['memory']['used_memory_human']} / {self.server_info_array['memory']['total_memory_human']})"
-        serverReport += stateIndicatingIcon + f"<b>Memory:</b> {preformatted(memory_usage_info)}\n"
+        serverReport += stateIndicatingIcon + f"<b>Memory:</b> {wrap_with_code(memory_usage_info)}\n"
 
         # Add Swap Status information.
         stateIndicatingIcon = ""
         if self.server_info_array['swap']['swap_status'] != "Off":
             hasWarning = True
             stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Swap Status:</b> {preformatted(self.server_info_array['swap']['swap_status'])}\n"
+        serverReport += stateIndicatingIcon + f"<b>Swap Status:</b> {wrap_with_code(self.server_info_array['swap']['swap_status'])}\n"
+        
+        # Add Processes.
+        thresholds = self.get_thresholds('processes')
+        stateIndicatingIcon = ""
+        system_value = float(self.server_info_array['processes']['amount_processes'])
+        if system_value > float(thresholds.error):
+            hasError = True
+            stateIndicatingIcon = errorIcon
+        elif system_value > float(thresholds.warning):
+            hasWarning = True
+            stateIndicatingIcon = warningIcon
+        serverReport += stateIndicatingIcon + f"<b>Processes:</b> {wrap_with_code(self.server_info_array['processes']['amount_processes'])}\n"
+        
+        # Users information.
+        thresholds = self.get_thresholds('users')
+        stateIndicatingIcon = ""
+        system_value = float(self.server_info_array['users']['logged_in_users'])
+        if system_value > float(thresholds.error):
+            hasError = True
+            stateIndicatingIcon = errorIcon
+        elif system_value > float(thresholds.warning):
+            hasWarning = True
+            stateIndicatingIcon = warningIcon
+        serverReport += stateIndicatingIcon + f"<b>Logged In Users:</b> {wrap_with_code(self.server_info_array['users']['logged_in_users'])}\n"
 
         # Network info in server info?
         if 'network' in self.server_info_array:
@@ -178,7 +222,7 @@ class ServerReportUtils:
                             hasWarning = True
                             stateIndicatingIcon = warningIcon
                         network_up_info = f"{self.server_info_array['network']['upstream_avg_human']}"
-                        serverReport += stateIndicatingIcon + f"<b>Network Upstream:</b> {preformatted(network_up_info)}\n"
+                        serverReport += stateIndicatingIcon + f"<b>Network Upstream:</b> {wrap_with_code(network_up_info)}\n"
 
                         # Network down.
                         thresholds = thresholds_down
@@ -191,7 +235,7 @@ class ServerReportUtils:
                             hasWarning = True
                             stateIndicatingIcon = warningIcon
                         network_up_info = f"{self.server_info_array['network']['downstream_avg_human']}"
-                        serverReport += stateIndicatingIcon + f"<b>Network Downstream:</b> {preformatted(network_up_info)}\n"
+                        serverReport += stateIndicatingIcon + f"<b>Network Downstream:</b> {wrap_with_code(network_up_info)}\n"
 
                         # Network total.
                         thresholds = thresholds_total
@@ -204,57 +248,185 @@ class ServerReportUtils:
                             hasWarning = True
                             stateIndicatingIcon = warningIcon
                         network_up_info = f"{self.server_info_array['network']['total_network_avg_human']}"
-                        serverReport += stateIndicatingIcon + f"<b>Network Total:</b> {preformatted(network_up_info)}\n"
+                        serverReport += stateIndicatingIcon + f"<b>Network Total:</b> {wrap_with_code(network_up_info)}\n"
 
                     else:
                         # No Thresholds in config.
                         hasError = True
                         stateIndicatingIcon = errorIcon
                         network_error_msg = f"No network thresholds in config"
-                        serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n"
+                        serverReport += stateIndicatingIcon + f"<b>Network:</b> {wrap_with_code(network_error_msg)}\n"
                 else:
                     # Not Enough vnstab data yet.
                     hasWarning = True
                     stateIndicatingIcon = warningIcon
                     network_error_msg = f"Vnstab does not have enough data yet"
-                    serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n"
+                    serverReport += stateIndicatingIcon + f"<b>Network:</b> {wrap_with_code(network_error_msg)}\n"
             else:
                 # Vnstab is not enabled.
                 hasError = True
                 stateIndicatingIcon = errorIcon
                 network_error_msg = f"Vnstab is not enabled"
-                serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n" 
+                serverReport += stateIndicatingIcon + f"<b>Network:</b> {wrap_with_code(network_error_msg)}\n" 
         else:
             # No Network info in server info.
             hasError = True
             stateIndicatingIcon = errorIcon
             network_error_msg = f"No network info in server info array"
-            serverReport += stateIndicatingIcon + f"<b>Network:</b> {preformatted(network_error_msg)}\n"
+            serverReport += stateIndicatingIcon + f"<b>Network:</b> {wrap_with_code(network_error_msg)}\n"
 
-
-        # Add Processes.
-        thresholds = self.get_thresholds('processes')
-        stateIndicatingIcon = ""
-        system_value = float(self.server_info_array['processes']['amount_processes'])
-        if system_value > float(thresholds.error):
-            hasError = True
-            stateIndicatingIcon = errorIcon
-        elif system_value > float(thresholds.warning):
-            hasWarning = True
-            stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Processes:</b> {preformatted(self.server_info_array['processes']['amount_processes'])}\n"
         
-        # Users information.
-        thresholds = self.get_thresholds('users')
-        stateIndicatingIcon = ""
-        system_value = float(self.server_info_array['users']['logged_in_users'])
-        if system_value > float(thresholds.error):
+        # Gluster info in server_info_array?
+        if 'gluster' in self.server_info_array:
+
+            # Gluster installed?
+            if self.server_info_array['gluster']['is_gluster_installed'].upper() == "TRUE":
+
+                # Any unhealthy peers?
+                number_of_peers = int(self.server_info_array['gluster']['number_of_peers'])
+                number_of_healthy_peers = int(self.server_info_array['gluster']['number_of_healthy_peers'])
+                number_of_unhealthy_peers = number_of_peers - number_of_healthy_peers
+
+                # Gluster peers Message.
+                gluster_peers_msg = wrap_with_code(f"Gluster Peers (Healthy: {number_of_healthy_peers} / Total: {number_of_peers})\n")
+
+                # Add peers output, if there are any unhealthy peers.
+                if number_of_unhealthy_peers != 0:
+                    for peer in self.server_info_array['gluster']['gluster_peers']:
+                        gluster_peers_msg += wrap_with_code(peer) + "\n"
+
+
+                # Any unhealthy volumes?
+                number_of_volumes = int(self.server_info_array['gluster']['number_of_volumes'])
+                number_of_healthy_volumes = int(self.server_info_array['gluster']['number_of_healthy_volumes'])
+                number_of_unhealthy_volumes = number_of_volumes - number_of_healthy_volumes
+
+                # Gluster volumes Message.
+                gluster_volumes_msg = wrap_with_code(f"Gluster Volumes (Healthy: {number_of_healthy_volumes} / Total: {number_of_volumes})\n")
+
+                # Add volumes output, if there are any unhealthy volumes.
+                if number_of_unhealthy_volumes != 0:
+                    for index, volume in enumerate(self.server_info_array['gluster']['gluster_volumes']):
+                        gluster_volumes_msg += italicUnderline("Volume: ") + wrap_with_code(volume) + "\n"
+
+                        # Print unhealthy bricks, if there are any.
+                        if self.server_info_array['gluster']['all_unhealthy_bricks'][index]:
+                            if not isArrayEmpty(self.server_info_array['gluster']['all_unhealthy_bricks'][index]):
+                                gluster_volumes_msg += italicUnderline("Unhealthy Bricks: ")
+                                for item in self.server_info_array['gluster']['all_unhealthy_bricks'][index]:
+                                    gluster_volumes_msg += wrap_with_code(item) + ", "
+                                # Remove the last occurrence of ", " and add a newline character.
+                                gluster_volumes_msg = gluster_volumes_msg.rstrip(", ") + "\n"
+
+                        # Print unhealthy processes, if there are any.
+                        if self.server_info_array['gluster']['all_unhealthy_processes'][index]:
+                            if not isArrayEmpty(self.server_info_array['gluster']['all_unhealthy_processes'][index]):
+                                gluster_volumes_msg += italicUnderline("Unhealthy Processes: ")
+                                for item in self.server_info_array['gluster']['all_unhealthy_processes'][index]:
+                                    gluster_volumes_msg += wrap_with_code(item) + ", "
+                                # Remove the last occurrence of ", " and add a newline character.
+                                gluster_volumes_msg = gluster_volumes_msg.rstrip(", ") + "\n"
+
+                        # Print errors/warnings, if there are any.
+                        if self.server_info_array['gluster']['all_errors_warnings'][index]:
+                            if not isArrayEmpty(self.server_info_array['gluster']['all_errors_warnings'][index]):
+                                gluster_volumes_msg += italicUnderline("Errors/Warnings: ")
+                                for item in self.server_info_array['gluster']['all_errors_warnings'][index]:
+                                    if item:
+                                        gluster_volumes_msg += wrap_with_code(item) + ", "
+                                # Remove the last occurrence of ", " and add a newline character.
+                                gluster_volumes_msg = gluster_volumes_msg.rstrip(", ") + "\n"
+
+                        # Print active tasks, if there are any.
+                        if self.server_info_array['gluster']['all_active_tasks'][index]:
+                            if not isArrayEmpty(self.server_info_array['gluster']['all_active_tasks'][index]):
+                                gluster_volumes_msg += italicUnderline("Active Tasks: ")
+                                for item in self.server_info_array['gluster']['all_active_tasks'][index]:
+                                    gluster_volumes_msg += wrap_with_code(item) + ", "
+                                # Remove the last occurrence of ", " and add a newline character.
+                                gluster_volumes_msg = gluster_volumes_msg.rstrip(", ") + "\n"
+
+
+
+                # Thresholds in config?
+                thresholds_available = True
+                try:
+                    gluster_unhealthy_peers = self.get_thresholds('gluster_unhealthy_peers')
+                    gluster_unhealthy_volumes = self.get_thresholds('gluster_unhealthy_volumes')
+                except Exception as e:
+                    thresholds_available = False
+
+                # Add Network Usage information.
+                if thresholds_available == True:
+
+                    # Unhealthy peers.
+                    thresholds = gluster_unhealthy_peers
+                    stateIndicatingIcon = ""
+                    system_value = number_of_unhealthy_peers
+                    if system_value >= float(thresholds.error) and float(thresholds.error) != 0:
+                        hasError = True
+                        stateIndicatingIcon = errorIcon
+                    elif system_value >= float(thresholds.warning) and float(thresholds.warning) != 0:
+                        hasWarning = True
+                        stateIndicatingIcon = warningIcon
+                    serverReport += stateIndicatingIcon + f"<b>Gluster Peers:</b> {gluster_peers_msg}"
+
+                    # Unhealthy volumes.
+                    thresholds = gluster_unhealthy_volumes
+                    stateIndicatingIcon = ""
+                    system_value = number_of_unhealthy_volumes
+                    if system_value >= float(thresholds.error) and float(thresholds.error) != 0:
+                        hasError = True
+                        stateIndicatingIcon = errorIcon
+                    elif system_value >= float(thresholds.warning) and float(thresholds.warning) != 0:
+                        hasWarning = True
+                        stateIndicatingIcon = warningIcon
+                    serverReport += stateIndicatingIcon + f"<b>Gluster Volumes:</b> {gluster_volumes_msg}"
+
+                else:
+                    # No Thresholds in config.
+                    hasError = True
+                    stateIndicatingIcon = errorIcon
+                    gluster_error_msg = f"No gluster thresholds in config"
+                    serverReport += stateIndicatingIcon + f"<b>Gluster:</b> {wrap_with_code(gluster_error_msg)}\n"
+
+            else:
+                # Gluster is not installed -> Determine handling.
+
+                # Prepare message and icon.
+                gluster_error_msg = "Gluster is not installed. "
+                stateIndicatingIcon = ""
+
+                # Check the config value and handle 
+                if self.gluster_not_installed_handling.upper() == "WARNING":
+                    stateIndicatingIcon = warningIcon
+                    hasWarning = True
+
+                elif self.gluster_not_installed_handling.upper() == "ERROR":
+                    stateIndicatingIcon = errorIcon
+                    hasError = True
+
+                elif self.gluster_not_installed_handling.upper() == "NONE":
+                    gluster_error_msg += ""
+
+                elif self.gluster_not_installed_handling == "not specified":
+                    gluster_error_msg += "Unspecified config value. Please specify 'warning', 'error', or 'none' for gluster_not_installed_handling."
+                    stateIndicatingIcon = errorIcon
+                    hasError = True
+
+                else:
+                    gluster_error_msg += "Invalid config value. Please specify 'warning', 'error', or 'none' for gluster_not_installed_handling."
+                    stateIndicatingIcon = errorIcon
+                    hasError = True
+
+                serverReport += stateIndicatingIcon + f"<b>Gluster:</b> {wrap_with_code(gluster_error_msg)}\n" 
+        else:
+            # No Gluster info in server info.
             hasError = True
             stateIndicatingIcon = errorIcon
-        elif system_value > float(thresholds.warning):
-            hasWarning = True
-            stateIndicatingIcon = warningIcon
-        serverReport += stateIndicatingIcon + f"<b>Logged In Users:</b> {preformatted(self.server_info_array['users']['logged_in_users'])}\n"
+            gluster_error_msg = f"No gluster info in server info array"
+            serverReport += stateIndicatingIcon + f"<b>Gluster:</b> {wrap_with_code(gluster_error_msg)}\n"
+
 
         # Add Updates information.
         thresholds = self.get_thresholds('updates')
@@ -268,7 +440,7 @@ class ServerReportUtils:
             stateIndicatingIcon = warningIcon
         updates_info = f"{self.server_info_array['updates']['amount_of_available_updates']} " \
                     f"({self.server_info_array['updates']['updates_available_output']})"
-        serverReport += stateIndicatingIcon + f"<b>Available Updates:</b> {preformatted(updates_info)}\n"
+        serverReport += stateIndicatingIcon + f"<b>Available Updates:</b> {wrap_with_code(updates_info)}\n"
 
         # Add System Restart information with an if-else statement.
         thresholds = self.get_thresholds('system_restart')
@@ -281,15 +453,15 @@ class ServerReportUtils:
             hasWarning = True
             stateIndicatingIcon = warningIcon
         restart_info = "No system restart required" if self.server_info_array['system_restart']['status'] == 'No' else \
-            f"System restart required for {preformatted(self.server_info_array['system_restart']['time_elapsed_human_readable'])}"
-        serverReport += stateIndicatingIcon + f"<b>System Restart:</b> {preformatted(restart_info)}\n"
+            f"System restart required for {wrap_with_code(self.server_info_array['system_restart']['time_elapsed_human_readable'])}"
+        serverReport += stateIndicatingIcon + f"<b>System Restart:</b> {wrap_with_code(restart_info)}\n"
 
         # Add Linux Server State Tool information.
         tool_info = ""
         thresholds = self.get_thresholds('linux_server_state_tool')
         stateIndicatingIcon = ""
         # Check remote connection.
-        if self.server_info_array['linux_server_state_tool']['repo_accessible'] == "True":
+        if self.server_info_array['linux_server_state_tool']['repo_accessible'] == "true":
 
             # Check local changes.
             if self.server_info_array['linux_server_state_tool']['local_changes'] == "Yes":
@@ -313,7 +485,7 @@ class ServerReportUtils:
         else:
             tool_info += "Remote repo Not accessible!! Check connection!! repo_accessible: " + self.server_info_array['linux_server_state_tool']['repo_accessible'] 
 
-        serverReport += f"<b>Linux Server State Tool:</b> {preformatted(tool_info)}\n"
+        serverReport += f"<b>Linux Server State Tool:</b> {wrap_with_code(tool_info)}\n"
 
         
         # Determine overall server state, adapt heading and concenate with rest of report.
@@ -322,7 +494,7 @@ class ServerReportUtils:
             stateIndicatingIcon = errorIcon
         elif hasWarning == True:
             stateIndicatingIcon = warningIcon
-        serverHeading = stateIndicatingIcon + f"<b>Server Status Report</b> - {preformatted(self.server_name)}\n"
+        serverHeading = stateIndicatingIcon + f"<b>Server Status Report</b> - {wrap_with_code(self.server_name)}\n"
         serverReport = serverHeading + serverReport
 
         return ServerReport(serverReport, hasWarning=hasWarning, hasError=hasError)

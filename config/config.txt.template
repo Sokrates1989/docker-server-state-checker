@@ -6,6 +6,7 @@
 		"warning": "1d",
 		"error": "3d"
 	},
+	"gluster_not_installed_handling": "warning|error|none",
 	"telegram":
 	{
 		"errorChatIDs":"-xxxxxxxxx,-xxxxxxxxx",
@@ -73,6 +74,16 @@
 		{
 			"warning":"1",
 			"error":"5"
+		},
+		"gluster_unhealthy_peers":
+		{
+			"warning":"1",
+			"error":"2"
+		},
+		"gluster_unhealthy_volumes":
+		{
+			"warning":"1",
+			"error":"2"
 		}
 	}
 }
