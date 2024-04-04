@@ -19,8 +19,17 @@ config_file_pathAndName = os.path.join(os.path.dirname(__file__), "..", "..", "c
 config_file = open(config_file_pathAndName)
 config_array = json.load(config_file)
 
-# Initialize telegram infos.
-botToken = os.getenv('botToken').strip().strip("\"") or config_array["telegram"]["botToken"].strip().strip("\"")
+# Fetch botToken from secret file, if existing.
+try:
+    BOT_TOKEN_FILE = os.getenv("botToken_FILE")
+    with open(f"{BOT_TOKEN_FILE}", "r") as bot_token_file:
+        botToken = bot_token_file.read().strip()
+finally:
+    # If there is no botToken_FILE.
+    if not botToken:
+        botToken = os.getenv('botToken').strip().strip("\"") or config_array["telegram"]["botToken"].strip().strip("\"")
+
+# Initialize telegram bot.
 bot = telebot.TeleBot(botToken, parse_mode="HTML")
 
 # Telegram Chats were to send info, error and warnings to.

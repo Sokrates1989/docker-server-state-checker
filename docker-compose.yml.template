@@ -21,10 +21,21 @@ services:
     tty: true        # docker run -t
     networks:
       - mynet
+    # In case you want to use docker swarm secret to save botToken (!RECOMMENDED!).
+    secrets:
+      - your_secret_name
     environment:
       - serverName="Please Name the server"
       - botToken="BOTTOKENBOTFATHERGAVEYOU"
+      - botToken_FILE=/run/secrets/your_secret_name # for docker swarm secret
       - errorChatIDs="-xxxxx,xxxxxx"
       - warningChatIDs="-xxxxx,xxxxxx"
       - infoChatIDs="-xxxxx"
     command: ["python", "src/check_server.py"]
+
+        
+
+# In case you want to use docker swarm secret to save botToken (!RECOMMENDED!).
+secrets:
+  "your_secret_name":
+    external: true
